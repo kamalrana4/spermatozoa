@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+body {
+  background: #000;
+}
+
+ellipse {
+  fill: #fff;
+}
+
+path {
+  fill: none;
+  stroke: #fff;
+  stroke-linecap: round;
+}
+
+.mid {
+  stroke-width: 4px;
+}
+
+.tail {
+  stroke-width: 2px;
+}
+
+</style>
+<body>
+<script src="js/d3.min.js"></script>
+<script>
+
+var width = window.innerWidth-10,
+    height =  window.innerHeight-50;
+//var center = { x : width/2 , y : 0 };
+var center = { x : width/2 , y : height/2 };
+
+var _xs = 1;
+var _ys = 1;
+
+var n = 100,
+    m = 12,
+    degrees = 180 / Math.PI;
+
+var spermatozoa = d3.range(n).map(function() {
+  var x = (Math.random() * width ) + 0,
+      y = (Math.random() * height);
+
+  return {
+    vx: getAngle(x,y)[0],
+    vy: getAngle(x,y)[1],
+    speed: (Math.random()*1)+1 ,
+    path: d3.range(m).map(function() { return [x, y]; }),
+    count: 0
+  };
+});
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+svg.append("defs")
+        .append('pattern')
+        .attr('id', 'eggshell')
+        .attr('patternUnits', 'userSpaceOnUse')
+        .attr('width', 300)
+        .attr('height', 300)
+        .attr('x', -150)
+        .attr('y', 150)
+        .append("image")
+        .attr("xlink:href", "img/2256773.png")
+        .attr('width',300)
+        .attr('height', 300);
+
+var egg = svg.append("circle")
+	.attr("r", 100)
+	.style("fill","url(#eggshell)")
+	.attr("transform", function(){
+		return "translate("+center.x+"," + center.y +")"
+	});
+
+var g = svg.selectAll("g")
+    .data(spermatozoa)
+  .enter().append("g");
+
+var head = g.append("ellipse")
+    .attr("rx", 6.5)
+    .attr("ry", 4);
+
+g.append("path")
+    .datum(function(d) { return d.path.slice(0, 3); })
+    .attr("class", "mid");
+
+g.append("path")
+    .datum(function(d) { return d.path; })
+    .attr("class", "tail");
+
+var tail = g.selectAll("path");
+
+d3.timer(function() {
+  for (var i = -1; ++i < n;) {
+    var spermatozoon = spermatozoa[i],
+        path = spermatozoon.path,
+        dx = spermatozoon.vx * spermatozoon.speed,
+        dy = spermatozoon.vy * spermatozoon.speed,
+        speed = Math.sqrt(dx * dx + dy * dy),
+        count = speed * 15,
+        k1 = -5 - speed / 3;
+        var x,y;
+        var stop = false;
+      var _x =path[0][0];
+      var _y =path[0][1];
+        if(Math.sqrt((_x-center.x)*(_x-center.x) + (_y-center.y)*(_y-center.y)) < 100){
+            x = path[0][0];
+            y = path[0][1];
+          //  getBaby();
+        } else{
+            x = path[0][0] += dx
+            y = path[0][1] += dy
+        }
+        
+    // Bounce off the walls.
+   // if (x < -50 || x > width) spermatozoon.vx *= -1;
+	if (x < 0 ) spermatozoon.vx *= -1;
+    //if (y < 0 || y > height) spermatozoon.vy *= -1;
+	//if (y < 0 ) spermatozoon.vy *= -1;
+
+    // Swim!
+    for (var j = 0; ++j < m;) {
+      var vx = x - path[j][0],
+          vy = y - path[j][1],
+          k2 = Math.sin(((spermatozoon.count += count) + j * 10) / 500) / speed;
+
+      path[j][0] = (x += dx / speed * k1) - dy * k2;
+      path[j][1] = (y += dy / speed * k1) + dx * k2;
+      speed = 1.6* Math.sqrt((dx = vx) * dx + (dy = vy) * dy);
+    }
+
+  }
+
+  head.attr("transform", headTransform);
+  tail.attr("d", tailPath);
+});
+
+function headTransform(d) {
+  return "translate(" + d.path[0] + ")rotate(" + Math.atan2(d.vy, d.vx) * degrees + ")";
+}
+function tailPath(d) {
+  return "M" + d.join("L");
+}
+
+function getAngle(dx,dy){
+	var _vx = 0;
+	var _vy = -1;
+	var _c = center.y;
+	var dx = center.x - dx;
+	var dy = _c - dy;
+	var k = Math.sqrt((dx*dx) + (dy*dy))
+	_vx = -(dx / k);
+	_vy = (dy / k);
+	
+	if(dy < _c){
+		_vy *= 1
+	}else{
+		_vy *= -1
+	}
+
+    if(dx < center.x){
+        _vx *= -1
+    }else{
+        _vx *= 1
+    }
+
+	return [_vx,_vy];
+}
+
+function getBaby(){
+    console.log("Baby will come soon....");
+}
+
+function getRandomX(){
+    var _xr = 0;
+    _xr = Math.floor(Math.random() * (width+(100)) ) + (width);
+    _xr *= Math.floor(Math.random()*2) == 1 ? 1 : -1;
+    if(_xr < 0 ){
+        _xr += ( width );
+    }
+//    _xs = _xs * -1;
+//    if(_xs > 0){
+//        _xr = Math.floor(Math.random() * (1) ) + ( -1*(width/2));
+//    }   else{
+//        _xr = Math.floor(Math.random() * (width+(width/2)) ) + (width);
+//    }
+    return _xr;
+}
+
+</script>
