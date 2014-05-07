@@ -45,7 +45,7 @@ var spermatozoa = d3.range(n).map(function() {
   var x = (Math.random() * width ) + 0,
       y = (Math.random() * height);
       x = getRandomX();
-        y = getRandomY();
+      y = getRandomY(x);
   return {
     vx: getAngle(x,y)[0],
     vy: getAngle(x,y)[1],
@@ -200,23 +200,46 @@ function getBaby(){
 }
 
 function getRandomX(){
-    var _xr = 0;
-    _xr = Math.floor(Math.random() * (width+(100)) ) + (width);
-    _xr *= Math.floor(Math.random()*2) == 1 ? 1 : -1;
-    if(_xr < 0 ){
-        _xr += ( width );
+    if((Math.floor(Math.random()*2) == 1 ? 1 : -1) < 0){
+        var _xr = 0;
+        _xr = Math.floor(Math.random() * (width+(100)) ) + (width);
+        _xr *= Math.floor(Math.random()*2) == 1 ? 1 : -1;
+        if(_xr < 0 ){
+            _xr += ( width );
+        }
+        return _xr;
+    }else{
+        var _xr = 0;
+        _xr = Math.floor(Math.random() * (width) ) + (0);
+        _xr *= Math.floor(Math.random()*2) == 1 ? 1 : -1;
+        if(_xr < 0 ){
+            _xr += ( width );
+        }
+        return _xr;
     }
-    return _xr;
+
 }
 
-function getRandomY(){
-    var _yr = 0;
-    _yr = Math.floor(Math.random() * (height+(100)) ) + (height);
-    _yr *= Math.floor(Math.random()*2) == 1 ? 1 : -1;
-    if(_yr < 0 ){
-        _yr += ( height );
+function getRandomY(_ccx){
+    if(_ccx < 0 || _ccx > width){
+        var _yr = 0;
+        _yr = Math.floor(Math.random() * (height))+ (0);
+        _yr *= Math.floor(Math.random()*2) == 1 ? 1 : -1;
+        if(_yr < 0 ){
+            _yr += ( height );
+        }
+        return _yr;
+    }else {
+        var _yr = 0;
+        _yr = Math.floor(Math.random() * (height+(100)) ) + (height);
+        _yr *= Math.floor(Math.random()*2) == 1 ? 1 : -1;
+        if(_yr < 0 ){
+            _yr += ( height );
+        }
+        return _yr;
+
     }
-    return _yr;
+
 }
 
 
