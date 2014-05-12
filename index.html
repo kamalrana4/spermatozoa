@@ -48,8 +48,8 @@ var spermatozoa = d3.range(n).map(function() {
       x = getRandomX();
       y = getRandomY(x);
   return {
-    vx: getAngle(x,y)[0],
-    vy: getAngle(x,y)[1],
+    vx: getAngle(x,y,center.x,center.y)[0],
+    vy: getAngle(x,y,center.x,center.y)[1],
     arc: ( Math.floor(Math.random() * 20) + 10) ,
     speed: (Math.random()*1)+1 ,
     path: d3.range(m).map(function() { return [x, y]; }),
@@ -127,8 +127,28 @@ d3.timer(function() {
                   if(spermatozoon.inside){
 //                      spermatozoon.vx;
 //                      spermatozoon.vy;
-                      x = path[0][0];
-                      y = path[0][1];
+                      var _red = 100+spermatozoon.arc;
+//                      var _cAngle = (spermatozoon.vy/spermatozoon.vx) + ( Math.PI/180 );
+//                      var _cAngle = (path[0][1]/path[0][0]) + ( Math.PI/180 );
+                      var _cAngle = Math.atan2(spermatozoon.vy, spermatozoon.vx);//(path[0][0] - center.x)/(_red);// ( Math.PI/180 );
+                      _cAngle = _cAngle + ( Math.PI/180 );
+//                      var _nTheta = _theta + ( Math.PI/180 );
+                      var _ny =  (_red * Math.sin(_cAngle)) + center.y;
+                      var _nx =  (_red * Math.cos(_cAngle)) + center.x;
+//                      console.log(_nx,_ny);
+//                      x = path[0][0];
+//                      y = path[0][1];
+                      spermatozoon.vx = getAngle(path[0][0],path[0][1],_nx,_ny)[0];
+                      spermatozoon.vy = getAngle(path[0][0],path[0][1],_nx,_ny)[1];
+                     // console.log(x,y)
+//                      dx = spermatozoon.vx * spermatozoon.speed;
+//                      dy = spermatozoon.vy * spermatozoon.speed;
+
+                      x = path[0][0] += dx
+                      y = path[0][1] += dy
+//                      x = path[0][0];
+//                      y = path[0][1];
+//                      console.log(path[0][0],path[0][1],x,y)
                   }else{
                       var _x =path[0][0];
                       var _y =path[0][1];
@@ -204,13 +224,13 @@ function tailPath(d) {
   return "M" + d.join("L");
 }
 
-function getAngle(dx,dy){
+function getAngle(dx,dy,cx,cy){
     var __ddx = dx+"";
     var __ddy = dy+"";
 	var _vx = 0;
 	var _vy = -1;
-	var _c = center.y;
-	var dx = center.x - dx;
+	var _c = cy;
+	var dx = cx - dx;
 	var dy = _c - dy;
 	var k = Math.sqrt((dx*dx) + (dy*dy))
 	_vx = -(dx / k);
@@ -230,15 +250,14 @@ function getAngle(dx,dy){
         }
     }
 
-
     if(__ddx > 0 ){
-        if(dx < center.x){
+        if(dx < cx){
             _vx *= -1
         }else{
             _vx *= 1
         }
     } else{
-        if(dx < center.x){
+        if(dx < cx){
             _vx *= 1
         }else{
             _vx *= -1
