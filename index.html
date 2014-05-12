@@ -37,10 +37,11 @@ var center = { x : width/2 , y : height/2 };
 var _xs = 1;
 var _ys = 1;
 
-var n = 100,
+var n = 3,
     m = 12,
     degrees = 180 / Math.PI;
-
+var counter = 0;
+var isStarted = false;
 var spermatozoa = d3.range(n).map(function() {
   var x = (Math.random() * width ) + 0,
       y = (Math.random() * height);
@@ -49,6 +50,7 @@ var spermatozoa = d3.range(n).map(function() {
   return {
     vx: getAngle(x,y)[0],
     vy: getAngle(x,y)[1],
+    arc: ( Math.floor(Math.random() * 20) + 10) ,
     speed: (Math.random()*1)+1 ,
     path: d3.range(m).map(function() { return [x, y]; }),
     count: 0
@@ -107,17 +109,69 @@ d3.timer(function() {
         count = speed * 15,
         k1 = -5 - speed / 3;
         var x,y;
-        var stop = false;
-      var _x =path[0][0];
-      var _y =path[0][1];
-        if(Math.sqrt((_x-center.x)*(_x-center.x) + (_y-center.y)*(_y-center.y)) < 100){
-            x = path[0][0];
-            y = path[0][1];
-          //  getBaby();
-        } else{
-            x = path[0][0] += dx
-            y = path[0][1] += dy
+        if(isStarted){
+              if(spermatozoon.isFirst){
+
+                  var _x =path[0][0];
+                  var _y =path[0][1];
+                  if(Math.sqrt((_x-center.x)*(_x-center.x) + (_y-center.y)*(_y-center.y)) < 10){
+                      x = path[0][0];
+                      y = path[0][1];
+                  } else{
+                      x = path[0][0] += (dx/4)
+                      y = path[0][1] += (dy/4)
+                  }
+
+              }else{
+
+                  if(spermatozoon.inside){
+//                      spermatozoon.vx;
+//                      spermatozoon.vy;
+                      x = path[0][0];
+                      y = path[0][1];
+                  }else{
+                      var _x =path[0][0];
+                      var _y =path[0][1];
+                      if(Math.sqrt((_x-center.x)*(_x-center.x) + (_y-center.y)*(_y-center.y)) < (100+spermatozoon.arc) ){
+                          x = path[0][0];
+                          y = path[0][1];
+                          if(spermatozoon.inside == undefined ){
+                              spermatozoon.inside = true;
+                              iTouchEgg();
+                          }
+                      } else{
+                          x = path[0][0] += dx
+                          y = path[0][1] += dy
+                      }
+                  }
+              }
+
+
+        }else{
+            if(spermatozoon.inside){
+                x = path[0][0];
+                y = path[0][1];
+            }else{
+                var _x =path[0][0];
+                var _y =path[0][1];
+                if(Math.sqrt((_x-center.x)*(_x-center.x) + (_y-center.y)*(_y-center.y)) < 100){
+                    x = path[0][0];
+                    y = path[0][1];
+                    if(spermatozoon.inside == undefined ){
+                        spermatozoon.inside = true;
+                        if(counter == 0){
+                            spermatozoon.isFirst = true;
+                        }
+                        iTouchEgg();
+                    }
+                } else{
+                    x = path[0][0] += dx
+                    y = path[0][1] += dy
+                }
+            }
         }
+
+
         
     // Bounce off the walls.
 //   if (x < -100 || x > width) spermatozoon.vx *= -1;
@@ -195,8 +249,14 @@ function getAngle(dx,dy){
 	return [_vx,_vy];
 }
 
-function getBaby(){
-    console.log("Baby will come soon....");
+function iTouchEgg(){
+
+    if(counter > 0 ){
+        isStarted = true;
+//        console.log(counter);
+    }
+
+    counter++;
 }
 
 function getRandomX(){
