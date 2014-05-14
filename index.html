@@ -1,9 +1,23 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
+        <html>
+        <head>
 <style>
 
 body {
   background: #000;
+}
+
+#final
+{
+    position:absolute;
+    width:512px; /*image width */
+    height:380px; /*image height */
+    left:50%;
+    top:50%;
+    margin-left:-256px; /*image width/2 */
+    margin-top:-140px; /*image height/2 */
+    display: none;
 }
 
 ellipse {
@@ -25,6 +39,7 @@ path {
 }
 
 </style>
+        </head>
 <body>
 <script src="js/d3.min.js"></script>
 <script>
@@ -42,6 +57,9 @@ var n = 100,
     degrees = 180 / Math.PI;
 var counter = 0;
 var isStarted = false;
+var isFertiliseStart = false;
+var eggScale = 0;
+
 var spermatozoa = d3.range(n).map(function() {
   var x = (Math.random() * width ) + 0,
       y = (Math.random() * height);
@@ -61,7 +79,7 @@ var svg = d3.select("body").append("svg")
     .attr("width", width)
     .attr("height", height);
 
-svg.append("defs")
+var defs = svg.append("defs")
         .append('pattern')
         .attr('id', 'eggshell')
         .attr('patternUnits', 'userSpaceOnUse')
@@ -116,6 +134,23 @@ d3.timer(function() {
                   var _x =path[0][0];
                   var _y =path[0][1];
                   if(Math.sqrt((_x-center.x)*(_x-center.x) + (_y-center.y)*(_y-center.y)) < 10){
+                      isFertiliseStart = true;
+                      if(eggScale <= 3)
+                        eggScale = eggScale + 0.01;
+                      else {
+                          d3.select("svg")
+                                  .remove();
+                          document.getElementById("final").style.display = "block";
+                      }
+                      if(eggScale > 2)
+                          defs.attr("xlink:href", "img/baby-inside-womb.png");
+
+                      if(eggScale > 1) {
+                          d3.select("g")
+                                  .remove();
+                          zoom(eggScale);
+                      }
+
                       x = path[0][0];
                       y = path[0][1];
                   } else{
@@ -167,9 +202,14 @@ d3.timer(function() {
                               spermatozoon.inside = true;
                               iTouchEgg();
                           }
-                      } else{
+                      } else if(!isFertiliseStart){
                           x = path[0][0] += dx;
                           y = path[0][1] += dy;
+                      }
+                      else
+                      {
+                          x = path[0][0];
+                          y = path[0][1];
                       }
                   }
               }
@@ -192,9 +232,15 @@ d3.timer(function() {
                         }
                         iTouchEgg();
                     }
-                } else{
-                    x = path[0][0] += dx
-                    y = path[0][1] += dy
+                }
+                else if(!isFertiliseStart){
+                    x = path[0][0] += dx;
+                    y = path[0][1] += dy;
+                }
+                else
+                {
+                    x = path[0][0];
+                    y = path[0][1];
                 }
             }
         }
@@ -329,5 +375,13 @@ function getRandomY(_ccx){
 
 }
 
-
+function zoom(eggScale)
+{
+    egg.attr("transform",
+                    "translate("+center.x+"," + center.y +")"
+                    + " scale(" + eggScale + ")");
+}
 </script>
+<img id="final" src="img/baby-inside-womb2.jpg " >
+</body>
+        </html>
