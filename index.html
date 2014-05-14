@@ -37,7 +37,7 @@ var center = { x : width/2 , y : height/2 };
 var _xs = 1;
 var _ys = 1;
 
-var n = 5,
+var n = 100,
     m = 12,
     degrees = 180 / Math.PI;
 var counter = 0;
@@ -109,6 +109,7 @@ d3.timer(function() {
         count = speed * 15,
         k1 = -5 - speed / 3;
         var x,y;
+
         if(isStarted){
               if(spermatozoon.isFirst){
 
@@ -118,37 +119,44 @@ d3.timer(function() {
                       x = path[0][0];
                       y = path[0][1];
                   } else{
-                      x = path[0][0] += (dx/4)
-                      y = path[0][1] += (dy/4)
+                      x = path[0][0] += (dx/8)
+                      y = path[0][1] += (dy/8)
                   }
 
               }else{
 
                   if(spermatozoon.inside){
-//                      spermatozoon.vx;
-//                      spermatozoon.vy;
-                      var _red = 100+spermatozoon.arc;
-//                      var _cAngle = (spermatozoon.vy/spermatozoon.vx) + ( Math.PI/180 );
-//                      var _cAngle = (path[0][1]/path[0][0]) + ( Math.PI/180 );
-                      var _cAngle = Math.atan2(spermatozoon.vy, spermatozoon.vx);//(path[0][0] - center.x)/(_red);// ( Math.PI/180 );
-                      _cAngle = _cAngle + ( Math.PI/180 );
-//                      var _nTheta = _theta + ( Math.PI/180 );
-                      var _ny =  (_red * Math.sin(_cAngle)) + center.y;
-                      var _nx =  (_red * Math.cos(_cAngle)) + center.x;
-//                      console.log(_nx,_ny);
-//                      x = path[0][0];
-//                      y = path[0][1];
-                      spermatozoon.vx = getAngle(path[0][0],path[0][1],_nx,_ny)[0];
-                      spermatozoon.vy = getAngle(path[0][0],path[0][1],_nx,_ny)[1];
-                     // console.log(x,y)
-//                      dx = spermatozoon.vx * spermatozoon.speed;
-//                      dy = spermatozoon.vy * spermatozoon.speed;
 
-                      x = path[0][0] += dx
-                      y = path[0][1] += dy
-//                      x = path[0][0];
-//                      y = path[0][1];
-//                      console.log(path[0][0],path[0][1],x,y)
+                      if(spermatozoon.isCirular == undefined) {
+                          x = path[0][0];
+                          y = path[0][1];
+                          spermatozoon.isCirular = true;
+                          var _theta = Math.atan(spermatozoon.vy / spermatozoon.vx);
+                          var _ntheta = - _theta;
+                          spermatozoon.vy = Math.sin(_theta);
+                          spermatozoon.vx = Math.cos(_theta);
+                          spermatozoon.rTheta = _ntheta;
+                          if(x > center.x)
+                            spermatozoon.rs = -1;
+                          else
+                            spermatozoon.rs = 1;
+                      }
+                      else
+                      {
+                          var sx = spermatozoon.rs;
+                          //if(spermatozoon.rTheta < 0)
+                          //  sx = -1;
+                          spermatozoon.rTheta = spermatozoon.rTheta + (sx * Math.PI / 180);
+                          if(sx == 1 && spermatozoon.rTheta >= 2 * Math.PI)
+                              spermatozoon.rTheta = 0;
+                          else if(sx == -1 && spermatozoon.rTheta <= -2 * Math.PI)
+                              spermatozoon.rTheta = 0;
+                          var _ntheta = spermatozoon.rTheta;
+                          spermatozoon.vy = Math.cos(_ntheta);
+                          spermatozoon.vx = Math.sin(_ntheta);
+                          x = path[0][0] += spermatozoon.vx * 2;
+                          y = path[0][1] += spermatozoon.vy * 2;
+                      }
                   }else{
                       var _x =path[0][0];
                       var _y =path[0][1];
@@ -160,8 +168,8 @@ d3.timer(function() {
                               iTouchEgg();
                           }
                       } else{
-                          x = path[0][0] += dx
-                          y = path[0][1] += dy
+                          x = path[0][0] += dx;
+                          y = path[0][1] += dy;
                       }
                   }
               }
