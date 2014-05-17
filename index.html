@@ -79,7 +79,7 @@ var svg = d3.select("body").append("svg")
     .attr("width", width)
     .attr("height", height);
 
-var defs = svg.append("defs")
+var eggshell = svg.append("defs")
         .append('pattern')
         .attr('id', 'eggshell')
         .attr('patternUnits', 'userSpaceOnUse')
@@ -92,12 +92,66 @@ var defs = svg.append("defs")
         .attr('width',300)
         .attr('height', 300);
 
+var babyshell = svg.append("defs")
+        .append('pattern')
+        .attr('id', 'babyshell')
+        .attr('patternUnits', 'userSpaceOnUse')
+        .attr('width', 300)
+        .attr('height', 300)
+        .attr('x', -150)
+        .attr('y', 150)
+        .append("image")
+        .attr("xlink:href", "img/baby-inside-womb.png")
+        .attr('width',300)
+        .attr('height', 300);
+
+var childshell = svg.append("defs")
+        .append('pattern')
+        .attr('id', 'childshell')
+        .attr('patternUnits', 'userSpaceOnUse')
+        .attr('width', 300)
+        .attr('height', 300)
+        .attr('x', -150)
+        .attr('y', 150)
+        .append("image")
+        .attr("xlink:href", "img/baby-inside-womb.png")
+        .attr('width',300)
+        .attr('height', 300);
+
+
+
 var egg = svg.append("circle")
 	.attr("r", 100)
 	.style("fill","url(#eggshell)")
 	.attr("transform", function(){
 		return "translate("+center.x+"," + center.y +")"
 	});
+
+var baby = svg.append("image")
+//        .attr("r", 100)
+//        .style("fill","url(#babyshell)")
+        .attr("xlink:href", "img/baby-inside-womb.png")
+        .attr('width',300)
+        .attr('height', 300)
+        .attr('x',-150)
+        .attr('y',-150)
+        .attr("transform", function(){
+            return "translate("+center.x+"," + center.y +")"
+        })
+        .style("opacity",0);
+
+var child = svg.append("image")
+//        .attr("r", 100)
+//        .style("fill","url(#babyshell)")
+        .attr("xlink:href", "img/baby-inside-womb2.jpg")
+        .attr('width',300)
+        .attr('height', 300)
+        .attr('x',-150)
+        .attr('y',-150)
+        .attr("transform", function(){
+            return "translate("+center.x+"," + center.y +")"
+        })
+        .style("opacity",0);
 
 var g = svg.selectAll("g")
     .data(spermatozoa)
@@ -137,18 +191,22 @@ d3.timer(function() {
                       isFertiliseStart = true;
                       if(eggScale <= 3)
                         eggScale = eggScale + 0.01;
-                      else {
-                          d3.select("svg")
-                                  .remove();
-                          document.getElementById("final").style.display = "block";
-                      }
-                      if(eggScale > 2)
-                          defs.attr("xlink:href", "img/baby-inside-womb.png");
+//                      else {
+//                          d3.select("svg")
+//                                  .remove();
+//                          document.getElementById("final").style.display = "block";
+//                      }
+//                      if(eggScale > 2)
+//                          eggshell.attr("xlink:href", "img/baby-inside-womb.png");
 
                       if(eggScale > 1) {
-                          d3.select("g")
-                                  .remove();
                           zoom(eggScale);
+                      }
+
+                      if(eggScale > 0.5)
+                      {
+                          svg.select("g")
+                                  .remove();
                       }
 
                       x = path[0][0];
@@ -380,8 +438,29 @@ function zoom(eggScale)
     egg.attr("transform",
                     "translate("+center.x+"," + center.y +")"
                     + " scale(" + eggScale + ")");
+
+    baby.attr("transform",
+                    "translate("+center.x+"," + center.y +")"
+                    + " scale(" + eggScale + ")");
+
+    child.attr("transform",
+                    "translate("+center.x+"," + center.y +")"
+                    + " scale(" + eggScale + ")");
+
+    if(eggScale < 2) {
+        egg.style("opacity", (2 - eggScale));
+
+        baby.style("opacity", (eggScale - 1));
+    }
+    else
+    {
+        baby.style("opacity", (3 - eggScale));
+
+        child.style("opacity", (eggScale - 2));
+    }
+
 }
 </script>
-<img id="final" src="img/baby-inside-womb2.jpg " >
+<!--<img id="final" src="img/baby-inside-womb2.jpg " >-->
 </body>
         </html>
